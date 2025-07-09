@@ -1,4 +1,3 @@
-
 import { ApiProperty } from '@nestjs/swagger';
 
 export class StoreResponseDto {
@@ -11,8 +10,18 @@ export class StoreResponseDto {
   @ApiProperty()
   email: string;
 
+  @ApiProperty({ nullable: true })
+  address: string | null;
+
   @ApiProperty()
-  address: string;
+  ownerId: number;
+
+  @ApiProperty({ required: false })
+  owner?: {
+    id: number;
+    name: string;
+    email: string;
+  };
 
   @ApiProperty()
   averageRating: number;
@@ -49,7 +58,8 @@ export class StoreDashboardResponseDto {
     id: number;
     name: string;
     email: string;
-    address: string;
+    address: string | null;
+    ownerId: number;
     averageRating: number;
     totalRatings: number;
   };

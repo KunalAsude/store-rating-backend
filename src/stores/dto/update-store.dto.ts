@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Length, IsOptional } from 'class-validator';
+import { IsEmail, IsString, Length, IsOptional, IsInt, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateStoreDto {
@@ -18,4 +18,10 @@ export class UpdateStoreDto {
   @IsString()
   @Length(0, 400, { message: 'Address must not exceed 400 characters' })
   address?: string;
+
+  @ApiProperty({ description: 'Owner user ID (must be existing user)', required: false })
+  @IsOptional()
+  @IsInt({ message: 'Owner ID must be a valid integer' })
+  @Min(1, { message: 'Owner ID must be greater than 0' })
+  ownerId?: number;
 }

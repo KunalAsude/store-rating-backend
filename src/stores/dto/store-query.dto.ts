@@ -1,4 +1,3 @@
-
 import { IsOptional, IsString, IsIn, IsInt, Min, Max, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -20,6 +19,13 @@ export class StoreQueryDto {
   @IsString()
   @Length(1, 400, { message: 'Address filter must be between 1 and 400 characters' })
   address?: string;
+
+  @ApiProperty({ description: 'Filter by owner ID', required: false })
+  @IsOptional()
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
+  @Min(1)
+  ownerId?: number;
 
   @ApiProperty({ description: 'Search query for name and address', required: false })
   @IsOptional()

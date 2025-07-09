@@ -26,6 +26,8 @@ import { UpdateStoreDto } from './dto/update-store.dto';
 
 @ApiTags('stores')
 @Controller('stores')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class StoresController {
     constructor(private readonly storesService: StoresService) { }
 
@@ -47,9 +49,8 @@ export class StoresController {
 
     // Admin only endpoints
     @Post()
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Create a new store (Admin only)' })
     @ApiResponse({
         status: HttpStatus.CREATED,

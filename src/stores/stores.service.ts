@@ -12,73 +12,48 @@ export class StoresService {
   constructor(private prisma: PrismaService) {}
 
   async createStore(createStoreDto: CreateStoreDto) {
-    const {
-      name,
-      email,
-      address,
-      ownerName,
-      ownerEmail,
-      ownerAddress,
-      password
-    } = createStoreDto;
+    const { name, email, address, ownerId } = createStoreDto;
 
     // Check if store email already exists
     const existingStore = await this.prisma.store.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (existingStore) {
       throw new ConflictException('Store with this email already exists');
     }
 
-    // Check if owner email already exists
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: ownerEmail }
+    // Check if owner exists
+    const owner = await this.prisma.user.findUnique({
+      where: { id: ownerId },
     });
 
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+    if (!owner) {
+      throw new NotFoundException(`Owner with ID ${ownerId} not found`);
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Create store with owner in a transaction
-    return await this.prisma.$transaction(async (tx) => {
-      // Create store owner user
-      const owner = await tx.user.create({
-        data: {
-          name: ownerName,
-          email: ownerEmail,
-          password: hashedPassword,
-          address: ownerAddress,
-          role: Role.STORE_OWNER
-        }
-      });
-
-      // Create store
-      const store = await tx.store.create({
-        data: {
-          name,
-          email,
-          address,
-          ownerId: owner.id
+    // Create store
+    const store = await this.prisma.store.create({
+      data: {
+        name,
+        email,
+        address,
+        ownerId,
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            address: true,
+            role: true,
+          },
         },
-        include: {
-          owner: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              address: true,
-              role: true
-            }
-          }
-        }
-      });
-
-      return store;
+      },
     });
+
+    return store;
   }
 
   async findAllStores(query: StoreQueryDto) {
