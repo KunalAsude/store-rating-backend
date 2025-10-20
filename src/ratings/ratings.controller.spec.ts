@@ -3,7 +3,7 @@ import { RatingsController } from './ratings.controller';
 
 describe('RatingsController', () => {
   let controller: RatingsController;
-
+// test cases to be applied
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RatingsController],
